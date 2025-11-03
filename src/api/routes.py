@@ -9,6 +9,7 @@ import os
 from base64 import b64encode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from datetime import timedelta
 
 api = Blueprint('api', __name__)
 
@@ -54,4 +55,27 @@ def signup_user():
     except Exception as error:
         db.session.rollback()
         return jsonify({"message": "Error creating user", "error": str(error)}), 500
+    
+
+@api.route('/login', methods=['POST'])
+def login_user():
+    data = request.json
+    
+    data = {
+        "email": data.get("email").strip(),
+        "password": data.get("password").strip()
+    }
+
+    if not data["email"] or not data["password"]:
+        return jsonify({"message": "Email and password are required"}), 400
+    
+    user = User.query.filter_by(email=data["email"]).one_or_none()
+
+    if not user:
+        return jsonify({"message": "Invalid email or password"}), 400
+    
+    if not check_password_hash(user.password, f"{data['password']}{user.salt}"):
+        return jsonify({"message": "Invalid credentials"}), 400
+    else:
+        return jsonify({"token": create_access_token(identity=user.id, expires_delta=timedelta(days=1))}), 200
     
