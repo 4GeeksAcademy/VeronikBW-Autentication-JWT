@@ -6,22 +6,32 @@ export const Navbar = () => {
 
 	const { store, dispatch } = useGlobalReducer()
 
+	const logout = () => {
+		dispatch ({ type: "SET_TOKEN", payload: null })
+		dispatch ({ type: "SET_USER", payload: null })
+		localStorage.removeItem("token")
+		localStorage.removeItem("user")
+	}
+
 
 	return (
 		<nav className="navbar navbar-expand-sm bg-body-tertiary">
 			<div className="container-fluid">
-				<a className="navbar-brand" href="#">Success' Secret</a>
+				<Link className="navbar-brand" to="/">Success' secret</Link>
 				{
 					store.token ? (
 						<div>
-							<button>Cerrar sesión</button>
+							<button
+							className="nav-link active border p-2 border-dark"
+							onClick={logout}
+							>Log out</button>
 						</div>
 					) : null
 				}
 				<ul className="navbar-nav ms-auto my-auto mb-2 mb-lg-0">
 
 					<li className="nav-item ">
-						<a className="nav-link active border" aria-current="page" href="#">secret is here</a>
+						<Link className="nav-link active border-dark" aria-current="page" to="/private">secret is here</Link>
 					</li>
 				</ul>
 			</div>

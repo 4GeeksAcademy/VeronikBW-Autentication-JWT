@@ -28,7 +28,7 @@ export default function Login() {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch(`${urlBase}/login`, {
+            const response = await fetch(`${urlBase}/api/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -39,13 +39,13 @@ export default function Login() {
             if (response.ok) {
                 dispatch({ type: "SET_TOKEN", payload: data.token })
 
-                const responseUser = await fetch(`${urlBase}/private`, {
+                const responseUser = await fetch(`${urlBase}/api/private`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${data.token}`
                     }
-                    
+
                 })
 
                 const dataUser = await responseUser.json();
@@ -55,8 +55,10 @@ export default function Login() {
                 localStorage.setItem("user", JSON.stringify(dataUser.user));
 
                 navigate("/private");
-            } 
-        }   catch (error) {
+            } else {
+                console.error("Login failed:", data.message);
+            }
+        } catch (error) {
             console.error("Error during login:", error);
         }
     };
@@ -65,44 +67,58 @@ export default function Login() {
 
 
     return (
-        <div className="container vh-100 d-flex flex-column justify-content-center home-container">
-            <div className="row justify-content-center"> 
-                <h1 className="text-center mb-4">Login with your email</h1>
-                <div className="col-12 col-md-6 py-4 border"> 
-                    <form
-                        onSubmit={handleSubmit}
-                    >
-                        <div className="form-group mb-3">
-                            <label htmlFor="btnEmail">Email address</label>
-                            <input
-                                type="email"
-                                placeholder="username@example.com"
-                                className="form-control"
-                                id="btnEmail"
-                                name="email"
-                                onChange={handleChange}
-                            />
+        <div className="container vh-100 d-flex align-items-center justify-content-center">
+            <div className="row w-100 justify-content-center">
+                <div className="col-12 col-md-6 col-lg-4">
+                    <div className="card shadow">
+                        <div className="card-body p-4">
+                            <h1 className="text-center mb-4">Login</h1>
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="btnEmail" className="form-label">Email address</label>
+                                    <input
+                                        type="email"
+                                        placeholder="username@example.com"
+                                        className="form-control"
+                                        id="btnEmail"
+                                        name="email"
+                                        onChange={handleChange}
+                                        value={user.email}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="btnPassword" className="form-label">Password</label>
+                                    <input
+                                        type="password"
+                                        placeholder="********"
+                                        className="form-control"
+                                        id="btnPassword"
+                                        name="password"
+                                        onChange={handleChange}
+                                        value={user.password}
+                                        required
+                                    />
+                                </div>
+                                <div className="d-grid mb-3">
+                                    <button type="submit" className="btn btn-primary">
+                                        Login
+                                    </button>
+                                </div>
+                            </form>
+
+                            <hr className="my-3" />
+
+                            <div className="text-center">
+                                <p className="mb-2 text-muted">Don't have an account yet?</p>
+                                <div className="d-grid">
+                                    <Link to="/signup" className="btn btn-outline-secondary">
+                                        Sign Up
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
-                        <div className="form-group mb-3">
-                            <label htmlFor="btnPassword">Password</label>
-                            <input
-                                type="password"
-                                placeholder="********"
-                                className="form-control"
-                                id="btnPassword"
-                                name="password"
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <button
-                            className="btn btn-primary w-100"
-                        >Login</button>
-                    </form>
-                </div>
-                <div className="w-100"> </div>
-                <div className="col-12 col-md-6 d-flex justify-content-between my-3">
-                    <p>Don't have an account yet?</p>
-                    <Link to="/signup" className="btn btn-secondary">Sign Up</Link>
+                    </div>
                 </div>
             </div>
         </div>
